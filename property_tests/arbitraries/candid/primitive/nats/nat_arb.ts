@@ -1,5 +1,17 @@
 import fc from 'fast-check';
-import { CandidMetaArb } from '../../candid_arb';
 import { bigintToSrcLiteral } from '../../to_src_literal/bigint';
+import { SimpleCandidDefinitionArb } from '../../simple_type_arbs/definition_arb';
+import { SimpleCandidValuesArb } from '../../simple_type_arbs/values_arb';
+import { CandidValueAndMetaArbGenerator } from '../../candid_value_and_meta_arb_generator';
 
-export const NatArb = CandidMetaArb(fc.bigUint(), 'nat', bigintToSrcLiteral);
+export const NatDefinitionArb = SimpleCandidDefinitionArb('nat');
+
+export const NatValueArb = SimpleCandidValuesArb(
+    fc.bigUint(),
+    bigintToSrcLiteral
+);
+
+export const NatArb = CandidValueAndMetaArbGenerator(
+    NatDefinitionArb,
+    () => NatValueArb
+);

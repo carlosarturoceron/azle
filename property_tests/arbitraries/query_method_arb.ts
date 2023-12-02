@@ -1,8 +1,8 @@
 import fc from 'fast-check';
 import { Test } from '../../test';
 import { UniqueIdentifierArb } from './unique_identifier_arb';
-import { CandidType } from './candid/candid_type_arb';
-import { CandidMeta } from './candid/candid_arb';
+import { CorrespondingJSType } from './candid/corresponding_js_type';
+import { CandidValueAndMeta } from './candid/candid_value_and_meta_arb';
 import { Named } from '../';
 
 export type QueryMethod = {
@@ -13,47 +13,50 @@ export type QueryMethod = {
 };
 
 export type BodyGenerator<
-    ParamAgentArgumentValue extends CandidType,
+    ParamAgentArgumentValue extends CorrespondingJSType,
     ParamAgentResponseValue,
-    ReturnTypeAgentArgumentValue extends CandidType,
+    ReturnTypeAgentArgumentValue extends CorrespondingJSType,
     ReturnTypeAgentResponseValue
 > = (
     namedParams: Named<
-        CandidMeta<ParamAgentArgumentValue, ParamAgentResponseValue>
+        CandidValueAndMeta<ParamAgentArgumentValue, ParamAgentResponseValue>
     >[],
-    returnType: CandidMeta<
+    returnType: CandidValueAndMeta<
         ReturnTypeAgentArgumentValue,
         ReturnTypeAgentResponseValue
     >
 ) => string;
 
 export type TestsGenerator<
-    ParamAgentArgumentValue extends CandidType,
+    ParamAgentArgumentValue extends CorrespondingJSType,
     ParamAgentResponseValue,
-    ReturnTypeAgentArgumentValue extends CandidType,
+    ReturnTypeAgentArgumentValue extends CorrespondingJSType,
     ReturnTypeAgentResponseValue
 > = (
     methodName: string,
     namedParams: Named<
-        CandidMeta<ParamAgentArgumentValue, ParamAgentResponseValue>
+        CandidValueAndMeta<ParamAgentArgumentValue, ParamAgentResponseValue>
     >[],
-    returnType: CandidMeta<
+    returnType: CandidValueAndMeta<
         ReturnTypeAgentArgumentValue,
         ReturnTypeAgentResponseValue
     >
 ) => Test[];
 
 export function QueryMethodArb<
-    ParamAgentArgumentValue extends CandidType,
+    ParamAgentArgumentValue extends CorrespondingJSType,
     ParamAgentResponseValue,
-    ReturnTypeAgentArgumentValue extends CandidType,
+    ReturnTypeAgentArgumentValue extends CorrespondingJSType,
     ReturnTypeAgentResponseValue
 >(
     paramTypeArrayArb: fc.Arbitrary<
-        CandidMeta<ParamAgentArgumentValue, ParamAgentResponseValue>[]
+        CandidValueAndMeta<ParamAgentArgumentValue, ParamAgentResponseValue>[]
     >,
     returnTypeArb: fc.Arbitrary<
-        CandidMeta<ReturnTypeAgentArgumentValue, ReturnTypeAgentResponseValue>
+        CandidValueAndMeta<
+            ReturnTypeAgentArgumentValue,
+            ReturnTypeAgentResponseValue
+        >
     >,
     constraints: {
         generateBody: BodyGenerator<
@@ -85,8 +88,10 @@ export function QueryMethodArb<
             ]);
 
             const candidTypeDeclarations = [
-                ...paramTypes.map((param) => param.src.typeDeclaration ?? ''),
-                returnType.src.typeDeclaration ?? ''
+                ...paramTypes.flatMap(
+                    (param) => param.src.typeAliasDeclarations
+                ),
+                ...returnType.src.typeAliasDeclarations
             ];
 
             const namedParams = paramTypes.map(
@@ -97,10 +102,10 @@ export function QueryMethodArb<
             );
 
             const paramCandidTypes = paramTypes
-                .map((param) => param.src.candidType)
+                .map((param) => param.src.typeAnnotation)
                 .join(', ');
 
-            const returnCandidType = returnType.src.candidType;
+            const returnCandidType = returnType.src.typeAnnotation;
 
             const paramNames = namedParams
                 .map((namedParam) => namedParam.name)

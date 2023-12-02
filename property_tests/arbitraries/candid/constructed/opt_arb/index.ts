@@ -1,6 +1,7 @@
-import { CandidType, CandidTypeArb } from '../../candid_type_arb';
+import { CandidDefinitionArb } from '../../candid_definition_arb';
+import { CorrespondingJSType } from '../../corresponding_js_type';
 import { OptArb as Base } from './base';
 
-export type Opt = [CandidType] | never[];
+export type Opt = [CorrespondingJSType] | never[];
 
-export const OptArb = Base(CandidTypeArb);
+export const OptArb = Base(CandidDefinitionArb);

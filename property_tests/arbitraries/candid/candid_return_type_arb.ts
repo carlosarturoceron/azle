@@ -1,12 +1,15 @@
 import fc from 'fast-check';
 
-import { CandidMeta } from './candid_arb';
-import { CandidType, CandidTypeArb } from './candid_type_arb';
+import {
+    CandidValueAndMeta,
+    CandidValueAndMetaArb
+} from './candid_value_and_meta_arb';
 import { VoidArb } from './primitive/void';
+import { CorrespondingJSType } from './corresponding_js_type';
 
-export type CandidReturnType = CandidType | undefined;
+export type CandidReturnType = CorrespondingJSType | undefined;
 
 export const CandidReturnTypeArb = fc.oneof(
-    { arbitrary: CandidTypeArb, weight: 17 },
+    { arbitrary: CandidValueAndMetaArb, weight: 17 },
     { arbitrary: VoidArb, weight: 1 }
-) as fc.Arbitrary<CandidMeta<CandidReturnType>>;
+) as fc.Arbitrary<CandidValueAndMeta<CandidReturnType>>;

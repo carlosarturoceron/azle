@@ -1,8 +1,9 @@
-import { CandidType, CandidTypeArb } from '../../candid_type_arb';
+import { CandidDefinitionArb } from '../../candid_definition_arb';
+import { CorrespondingJSType } from '../../corresponding_js_type';
 import { RecordArb as Base } from './base';
 
 export type Record = {
-    [x: string]: CandidType;
+    [x: string]: CorrespondingJSType;
 };
 
-export const RecordArb = Base(CandidTypeArb);
+export const RecordArb = Base(CandidDefinitionArb);
