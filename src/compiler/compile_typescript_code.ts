@@ -2,6 +2,7 @@ import * as swc from '@swc/core';
 import { buildSync } from 'esbuild';
 import { JSCanisterConfig, JavaScript, TypeScript } from './utils/types';
 import { Result } from './utils/result';
+import { join } from 'path';
 
 export function compileTypeScriptToJavaScript(
     main: string,
@@ -16,7 +17,8 @@ export function compileTypeScriptToJavaScript(
                             return `'${envVarName}': '${process.env[envVarName]}'`;
                         })
                         .join(',')}
-                }
+                },
+                version: 'v0.10'
             };
         `;
 
@@ -64,6 +66,10 @@ export function bundleAndTranspileJs(ts: TypeScript): JavaScript {
 // TODO there is a lot of minification/transpiling etc we could do with esbuild or with swc
 // TODO we need to decide which to use for what
 export function bundleFromString(ts: TypeScript): JavaScript {
+    // console.log(process.cwd());
+    // console.log(__dirname);
+    // console.log(require('azle').resolveDir);
+
     // TODO tree-shaking does not seem to work with stdin. I have learned this from sad experience
     const buildResult = buildSync({
         stdin: {
@@ -74,7 +80,14 @@ export function bundleFromString(ts: TypeScript): JavaScript {
         bundle: true,
         treeShaking: true,
         write: false,
-        logLevel: 'silent'
+        logLevel: 'silent',
+        alias: {
+            crypto: 'crypto-browserify',
+            // fs: 'memfs',
+            fs: 'memory-fs',
+            http: join(__dirname, '../polyfills/http.js'),
+            zlib: join(__dirname, '../polyfills/zlib.js')
+        }
         // TODO tsconfig was here to attempt to set importsNotUsedAsValues to true to force Principal to always be bundled
         // TODO now we always bundle Principal for all code, but I am keeping this here in case we run into the problem elsewhere
         // tsconfig: path.join( __dirname, './esbuild-tsconfig.json') // TODO this path resolution may cause problems on non-Linux systems, beware...might not be necessary now that we are using stdin

@@ -49,3 +49,15 @@ globalThis.crypto = {
 };
 
 globalThis.Buffer = Buffer;
+
+globalThis.setTimeout = (handler: any, timeout?: any) => {
+    return ic.setTimer(timeout, handler);
+};
+
+globalThis.setImmediate = (handler: any) => {
+    return globalThis.setTimeout(handler, 0);
+};
+
+globalThis.window = globalThis;
+globalThis.global = globalThis;
+globalThis.self = globalThis;
