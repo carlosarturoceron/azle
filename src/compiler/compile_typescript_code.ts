@@ -82,11 +82,50 @@ export function bundleFromString(ts: TypeScript): JavaScript {
         write: false,
         logLevel: 'silent',
         alias: {
+            // TODO this is how you overwrite libraries
             crypto: 'crypto-browserify',
-            // fs: 'memfs',
             fs: 'memory-fs',
-            http: join(__dirname, '../polyfills/http.js'),
-            zlib: join(__dirname, '../polyfills/zlib.js')
+            zlib: 'pako'
+            // fs: 'memory-fs',
+            // fs: join(__dirname, '../polyfills/fs'),
+            // http: join(__dirname, '../polyfills/http.js'),
+            // https: join(__dirname, '../polyfills/https'),
+            // _http_agent: join(__dirname, '../polyfills/_http_agent.js'),
+            // _http_client: join(__dirname, '../polyfills/_http_client.js'),
+            // _http_common: join(__dirname, '../polyfills/_http_common.js'),
+            // _http_outgoing: join(__dirname, '../polyfills/_http_outgoing.js'),
+            // _http_incoming: join(__dirname, '../polyfills/_http_incoming.js'),
+            // _http_server: join(__dirname, '../polyfills/_http_server.js'),
+            // zlib: join(__dirname, '../polyfills/zlib.js'),
+            // internal: join(__dirname, '../polyfills/internal'),
+            // timers: join(__dirname, '../polyfills/timers/promises.js'),
+            // util: join(__dirname, '../polyfills/util'),
+            // 'node:util': join(__dirname, '../polyfills/util'),
+            // v8: join(__dirname, '../polyfills/v8.js'),
+            // assert: join(__dirname, '../polyfills/assert.js'),
+            // path: join(__dirname, '../polyfills/path.js'),
+            // net: join(__dirname, '../polyfills/net.js'),
+            // events: join(__dirname, '../polyfills/events'),
+            // 'node:events': join(__dirname, '../polyfills/events'),
+            // async_hooks: join(__dirname, '../polyfills/async_hooks.js'),
+            // diagnostics_channel: join(
+            //     __dirname,
+            //     '../polyfills/diagnostics_channel.js'
+            // ),
+            // stream: join(__dirname, '../polyfills/stream'),
+            // 'node:stream': join(__dirname, '../polyfills/stream'),
+            // querystring: join(__dirname, '../polyfills/querystring'),
+            // worker_threads: join(__dirname, '../polyfills/worker_threads'),
+            // perf_hooks: join(__dirname, '../polyfills/perf_hooks'),
+            // tls: join(__dirname, '../polyfills/tls'),
+            // dns: join(__dirname, '../polyfills/dns'),
+            // child_process: join(__dirname, '../polyfills/child_process'),
+            // dgram: join(__dirname, '../polyfills/dgram'),
+            // cluster: join(__dirname, '../polyfills/cluster'),
+            // vm: join(__dirname, '../polyfills/vm'),
+            // _tls_wrap: join(__dirname, '../polyfills/_tls_wrap'),
+            // _tls_common: join(__dirname, '../polyfills/_tls_common'),
+            // os: join(__dirname, '../polyfills/os')
         }
         // TODO tsconfig was here to attempt to set importsNotUsedAsValues to true to force Principal to always be bundled
         // TODO now we always bundle Principal for all code, but I am keeping this here in case we run into the problem elsewhere

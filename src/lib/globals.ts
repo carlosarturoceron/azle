@@ -61,3 +61,8 @@ globalThis.setImmediate = (handler: any) => {
 globalThis.window = globalThis;
 globalThis.global = globalThis;
 globalThis.self = globalThis;
+
+globalThis.process = {
+    env: {},
+    version: 'v0.10'
+};

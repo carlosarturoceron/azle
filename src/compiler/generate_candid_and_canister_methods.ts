@@ -30,7 +30,13 @@ export function generateCandidAndCanisterMethods(mainJs: string): {
         exports: {},
         console,
         TextDecoder,
-        TextEncoder
+        TextEncoder,
+        process: {
+            env: {},
+            version: 'v0.10'
+        },
+        setImmediate,
+        setTimeout
     };
     const context = new vm.createContext(sandbox);
 
