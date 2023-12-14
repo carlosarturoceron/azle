@@ -13,52 +13,52 @@
  * @private
  */
 
-// var Route = require('./route');
-// var Layer = require('./layer');
+var Route = require('./route');
+var Layer = require('./layer');
 // var methods = require('methods');
 // var mixin = require('utils-merge');
-// var debug = require('debug')('express:router');
+var debug = require('debug')('express:router');
 // var deprecate = require('depd')('express');
-// var flatten = require('array-flatten');
+var { flatten } = require('array-flatten'); // TODO this had to change
 // var parseUrl = require('parseurl');
-// var setPrototypeOf = require('setprototypeof')
+var setPrototypeOf = require('setprototypeof');
 
 /**
  * Module variables.
  * @private
  */
 
-// var objectRegExp = /^\[object (\S+)\]$/;
-// var slice = Array.prototype.slice;
-// var toString = Object.prototype.toString;
+var objectRegExp = /^\[object (\S+)\]$/;
+var slice = Array.prototype.slice;
+var toString = Object.prototype.toString;
 
-// /**
-//  * Initialize a new `Router` with the given `options`.
-//  *
-//  * @param {Object} [options]
-//  * @return {Router} which is a callable function
-//  * @public
-//  */
+/**
+ * Initialize a new `Router` with the given `options`.
+ *
+ * @param {Object} [options]
+ * @return {Router} which is a callable function
+ * @public
+ */
 
-// var proto = module.exports = function(options) {
-//   var opts = options || {};
+var proto = (module.exports = function (options) {
+    var opts = options || {};
 
-//   function router(req, res, next) {
-//     router.handle(req, res, next);
-//   }
+    function router(req, res, next) {
+        router.handle(req, res, next);
+    }
 
-//   // mixin Router class functions
-//   setPrototypeOf(router, proto)
+    // mixin Router class functions
+    setPrototypeOf(router, proto);
 
-//   router.params = {};
-//   router._params = [];
-//   router.caseSensitive = opts.caseSensitive;
-//   router.mergeParams = opts.mergeParams;
-//   router.strict = opts.strict;
-//   router.stack = [];
+    router.params = {};
+    router._params = [];
+    router.caseSensitive = opts.caseSensitive;
+    router.mergeParams = opts.mergeParams;
+    router.strict = opts.strict;
+    router.stack = [];
 
-//   return router;
-// };
+    return router;
+});
 
 // /**
 //  * Map the given param placeholder `name`(s) to the given callback.
@@ -421,98 +421,112 @@
 //   param();
 // };
 
-// /**
-//  * Use the given middleware function, with optional path, defaulting to "/".
-//  *
-//  * Use (like `.all`) will run for any http METHOD, but it will not add
-//  * handlers for those methods so OPTIONS requests will not consider `.use`
-//  * functions even if they could respond.
-//  *
-//  * The other difference is that _route_ path is stripped and not visible
-//  * to the handler function. The main effect of this feature is that mounted
-//  * handlers can operate without any code changes regardless of the "prefix"
-//  * pathname.
-//  *
-//  * @public
-//  */
+/**
+ * Use the given middleware function, with optional path, defaulting to "/".
+ *
+ * Use (like `.all`) will run for any http METHOD, but it will not add
+ * handlers for those methods so OPTIONS requests will not consider `.use`
+ * functions even if they could respond.
+ *
+ * The other difference is that _route_ path is stripped and not visible
+ * to the handler function. The main effect of this feature is that mounted
+ * handlers can operate without any code changes regardless of the "prefix"
+ * pathname.
+ *
+ * @public
+ */
 
-// proto.use = function use(fn) {
-//   var offset = 0;
-//   var path = '/';
+proto.use = function use(fn) {
+    var offset = 0;
+    var path = '/';
 
-//   // default path to '/'
-//   // disambiguate router.use([fn])
-//   if (typeof fn !== 'function') {
-//     var arg = fn;
+    // default path to '/'
+    // disambiguate router.use([fn])
+    if (typeof fn !== 'function') {
+        var arg = fn;
 
-//     while (Array.isArray(arg) && arg.length !== 0) {
-//       arg = arg[0];
-//     }
+        while (Array.isArray(arg) && arg.length !== 0) {
+            arg = arg[0];
+        }
 
-//     // first arg is the path
-//     if (typeof arg !== 'function') {
-//       offset = 1;
-//       path = fn;
-//     }
-//   }
+        // first arg is the path
+        if (typeof arg !== 'function') {
+            offset = 1;
+            path = fn;
+        }
+    }
 
-//   var callbacks = flatten(slice.call(arguments, offset));
+    const temp0 = slice.call(arguments, offset);
+    const temp1 = flatten(temp0);
 
-//   if (callbacks.length === 0) {
-//     throw new TypeError('Router.use() requires a middleware function')
-//   }
+    var callbacks = temp1;
 
-//   for (var i = 0; i < callbacks.length; i++) {
-//     var fn = callbacks[i];
+    if (callbacks.length === 0) {
+        throw new TypeError('Router.use() requires a middleware function');
+    }
 
-//     if (typeof fn !== 'function') {
-//       throw new TypeError('Router.use() requires a middleware function but got a ' + gettype(fn))
-//     }
+    for (var i = 0; i < callbacks.length; i++) {
+        var fn = callbacks[i];
 
-//     // add the middleware
-//     debug('use %o %s', path, fn.name || '<anonymous>')
+        if (typeof fn !== 'function') {
+            throw new TypeError(
+                'Router.use() requires a middleware function but got a ' +
+                    gettype(fn)
+            );
+        }
 
-//     var layer = new Layer(path, {
-//       sensitive: this.caseSensitive,
-//       strict: false,
-//       end: false
-//     }, fn);
+        // add the middleware
+        debug('use %o %s', path, fn.name || '<anonymous>');
 
-//     layer.route = undefined;
+        var layer = new Layer(
+            path,
+            {
+                sensitive: this.caseSensitive,
+                strict: false,
+                end: false
+            },
+            fn
+        );
 
-//     this.stack.push(layer);
-//   }
+        layer.route = undefined;
 
-//   return this;
-// };
+        this.stack.push(layer);
+    }
 
-// /**
-//  * Create a new Route for the given path.
-//  *
-//  * Each route contains a separate middleware stack and VERB handlers.
-//  *
-//  * See the Route api documentation for details on adding handlers
-//  * and middleware to routes.
-//  *
-//  * @param {String} path
-//  * @return {Route}
-//  * @public
-//  */
+    return this;
+};
 
-// proto.route = function route(path) {
-//   var route = new Route(path);
+/**
+ * Create a new Route for the given path.
+ *
+ * Each route contains a separate middleware stack and VERB handlers.
+ *
+ * See the Route api documentation for details on adding handlers
+ * and middleware to routes.
+ *
+ * @param {String} path
+ * @return {Route}
+ * @public
+ */
 
-//   var layer = new Layer(path, {
-//     sensitive: this.caseSensitive,
-//     strict: this.strict,
-//     end: true
-//   }, route.dispatch.bind(route));
+proto.route = function route(path) {
+    var route = new Route(path);
 
-//   layer.route = route;
+    var layer = new Layer(
+        path,
+        {
+            sensitive: this.caseSensitive,
+            strict: this.strict,
+            end: true
+        },
+        route.dispatch.bind(route)
+    );
 
-//   this.stack.push(layer);
-//   return route;
-// };
+    layer.route = route;
+
+    this.stack.push(layer);
+    return route;
+};
 
 // // create Router#VERB functions
 // methods.concat('all').forEach(function(method){
