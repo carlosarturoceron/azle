@@ -13,7 +13,7 @@
  * @private
  */
 
-// var finalhandler = require('finalhandler');
+var finalhandler = require('finalhandler');
 var Router = require('./router');
 var methods = require('methods');
 var middleware = require('./middleware/init');

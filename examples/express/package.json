@@ -12,6 +12,7 @@
         "debug": "^4.3.4",
         "depd": "^2.0.0",
         "events": "^3.3.0",
+        "finalhandler": "^1.2.0",
         "memfs": "^4.6.0",
         "memory-fs": "^0.5.0",
         "merge-descriptors": "^2.0.0",
