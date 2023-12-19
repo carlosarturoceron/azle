@@ -142,9 +142,6 @@ proto.param = function param(name, fn) {
 proto.handle = function handle(req, res, out) {
     var self = this;
 
-    console.log('req', req);
-    console.log('res', res);
-
     debug('dispatching %s %s', req.method, req.url);
 
     var idx = 0;
@@ -160,8 +157,6 @@ proto.handle = function handle(req, res, out) {
 
     // middleware and routes
     var stack = self.stack;
-
-    console.log('stack', stack);
 
     // manage inter-router variables
     var parentParams = req.params;
@@ -186,8 +181,6 @@ proto.handle = function handle(req, res, out) {
     next();
 
     function next(err) {
-        console.log('err', err);
-
         var layerError = err === 'route' ? null : err;
 
         // remove added slash
@@ -203,23 +196,17 @@ proto.handle = function handle(req, res, out) {
             removed = '';
         }
 
-        console.log(req);
-
         // signal to exit router
         if (layerError === 'router') {
             setImmediate(done, null);
             return;
         }
 
-        console.log('made it 0');
-
         // no more matching layers
         if (idx >= stack.length) {
             setImmediate(done, layerError);
             return;
         }
-
-        console.log('made it 1');
 
         // max sync stack
         if (++sync > 100) {
@@ -229,15 +216,9 @@ proto.handle = function handle(req, res, out) {
         // get pathname of request
         var path = getPathname(req);
 
-        console.log('path', path);
-
         if (path == null) {
-            console.log('inside of here');
-
             return done(layerError);
         }
-
-        console.log('still made it');
 
         // find next matching layer
         var layer;
@@ -245,39 +226,24 @@ proto.handle = function handle(req, res, out) {
         var route;
 
         while (match !== true && idx < stack.length) {
-            console.log('inside the while');
-
             layer = stack[idx++];
             match = matchLayer(layer, path);
 
-            console.log('match', match);
-
             route = layer.route;
 
-            console.log('inside the while 0');
-
             if (typeof match !== 'boolean') {
-                console.log('inside of layerError');
                 // hold on to layerError
                 layerError = layerError || match;
             }
-
-            console.log('inside the while 1');
 
             if (match !== true) {
                 continue;
             }
 
-            console.log('inside the while 2');
-
             if (!route) {
                 // process non-route handlers normally
                 continue;
             }
-
-            console.log('inside the while 3');
-
-            console.log('layerError', layerError);
 
             // TODO is there a problem officer? It's an empty object
             // if (layerError) {
@@ -286,12 +252,8 @@ proto.handle = function handle(req, res, out) {
             //   continue;
             // }
 
-            console.log('inside the while 4');
-
             var method = req.method;
             var has_method = route._handles_method(method);
-
-            console.log('inside the while 5');
 
             // build up automatic options response
             if (!has_method && method === 'OPTIONS') {
@@ -303,8 +265,6 @@ proto.handle = function handle(req, res, out) {
                 match = false;
             }
         }
-
-        console.log('no match, outside of the while');
 
         // no match
         if (match !== true) {

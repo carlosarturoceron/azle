@@ -29,32 +29,36 @@
 // var normalizeTypes = require('./utils').normalizeTypes;
 // var setCharset = require('./utils').setCharset;
 // var cookie = require('cookie');
-// var send = require('send');
+var send = require('send');
 // var extname = path.extname;
-// var mime = send.mime;
+var mime = send.mime;
 // var resolve = path.resolve;
 // var vary = require('vary');
 
-// /**
-//  * Response prototype.
-//  * @public
-//  */
+// TODO custom code here
+class HttpServerResponse {}
 
-// var res = Object.create(http.ServerResponse.prototype)
+/**
+ * Response prototype.
+ * @public
+ */
 
-// /**
-//  * Module exports.
-//  * @public
-//  */
+// TODO this is what came from Node.js http.ServerResponse
+var res = Object.create(HttpServerResponse.prototype); // TODO custom code
 
-// module.exports = res
+/**
+ * Module exports.
+ * @public
+ */
 
-// /**
-//  * Module variables.
-//  * @private
-//  */
+module.exports = res;
 
-// var charsetRegExp = /;\s*charset\s*=/;
+/**
+ * Module variables.
+ * @private
+ */
+
+var charsetRegExp = /;\s*charset\s*=/;
 
 // /**
 //  * Set status `code`.
@@ -95,145 +99,201 @@
 //   }).join(', '));
 // };
 
-// /**
-//  * Send a response.
-//  *
-//  * Examples:
-//  *
-//  *     res.send(Buffer.from('wahoo'));
-//  *     res.send({ some: 'json' });
-//  *     res.send('<p>some html</p>');
-//  *
-//  * @param {string|number|boolean|object|Buffer} body
-//  * @public
-//  */
+/**
+ * Send a response.
+ *
+ * Examples:
+ *
+ *     res.send(Buffer.from('wahoo'));
+ *     res.send({ some: 'json' });
+ *     res.send('<p>some html</p>');
+ *
+ * @param {string|number|boolean|object|Buffer} body
+ * @public
+ */
 
-// res.send = function send(body) {
-//   var chunk = body;
-//   var encoding;
-//   var req = this.req;
-//   var type;
+res.send = function send(body) {
+    console.log('res.send 0');
 
-//   // settings
-//   var app = this.app;
+    var chunk = body;
+    var encoding;
+    var req = this.req;
+    var type;
 
-//   // allow status / body
-//   if (arguments.length === 2) {
-//     // res.send(body, status) backwards compat
-//     if (typeof arguments[0] !== 'number' && typeof arguments[1] === 'number') {
-//       deprecate('res.send(body, status): Use res.status(status).send(body) instead');
-//       this.statusCode = arguments[1];
-//     } else {
-//       deprecate('res.send(status, body): Use res.status(status).send(body) instead');
-//       this.statusCode = arguments[0];
-//       chunk = arguments[1];
-//     }
-//   }
+    // settings
+    var app = this.app;
 
-//   // disambiguate res.send(status) and res.send(status, num)
-//   if (typeof chunk === 'number' && arguments.length === 1) {
-//     // res.send(status) will set status message as text string
-//     if (!this.get('Content-Type')) {
-//       this.type('txt');
-//     }
+    // allow status / body
+    if (arguments.length === 2) {
+        // res.send(body, status) backwards compat
+        if (
+            typeof arguments[0] !== 'number' &&
+            typeof arguments[1] === 'number'
+        ) {
+            deprecate(
+                'res.send(body, status): Use res.status(status).send(body) instead'
+            );
+            this.statusCode = arguments[1];
+        } else {
+            deprecate(
+                'res.send(status, body): Use res.status(status).send(body) instead'
+            );
+            this.statusCode = arguments[0];
+            chunk = arguments[1];
+        }
+    }
 
-//     deprecate('res.send(status): Use res.sendStatus(status) instead');
-//     this.statusCode = chunk;
-//     chunk = statuses.message[chunk]
-//   }
+    console.log('res.send 1');
 
-//   switch (typeof chunk) {
-//     // string defaulting to html
-//     case 'string':
-//       if (!this.get('Content-Type')) {
-//         this.type('html');
-//       }
-//       break;
-//     case 'boolean':
-//     case 'number':
-//     case 'object':
-//       if (chunk === null) {
-//         chunk = '';
-//       } else if (Buffer.isBuffer(chunk)) {
-//         if (!this.get('Content-Type')) {
-//           this.type('bin');
-//         }
-//       } else {
-//         return this.json(chunk);
-//       }
-//       break;
-//   }
+    // disambiguate res.send(status) and res.send(status, num)
+    if (typeof chunk === 'number' && arguments.length === 1) {
+        // res.send(status) will set status message as text string
+        if (!this.get('Content-Type')) {
+            this.type('txt');
+        }
 
-//   // write strings in utf-8
-//   if (typeof chunk === 'string') {
-//     encoding = 'utf8';
-//     type = this.get('Content-Type');
+        deprecate('res.send(status): Use res.sendStatus(status) instead');
+        this.statusCode = chunk;
+        chunk = statuses.message[chunk];
+    }
 
-//     // reflect this in content-type
-//     if (typeof type === 'string') {
-//       this.set('Content-Type', setCharset(type, 'utf-8'));
-//     }
-//   }
+    console.log('res.send 2');
 
-//   // determine if ETag should be generated
-//   var etagFn = app.get('etag fn')
-//   var generateETag = !this.get('ETag') && typeof etagFn === 'function'
+    switch (typeof chunk) {
+        // string defaulting to html
+        case 'string':
+            console.log('before switch');
+            if (!this.get('Content-Type')) {
+                console.log('in switch');
+                this.type('html');
+            }
+            console.log('out of switch');
+            break;
+        case 'boolean':
+        case 'number':
+        case 'object':
+            if (chunk === null) {
+                chunk = '';
+            } else if (Buffer.isBuffer(chunk)) {
+                if (!this.get('Content-Type')) {
+                    this.type('bin');
+                }
+            } else {
+                return this.json(chunk);
+            }
+            break;
+    }
 
-//   // populate Content-Length
-//   var len
-//   if (chunk !== undefined) {
-//     if (Buffer.isBuffer(chunk)) {
-//       // get length of Buffer
-//       len = chunk.length
-//     } else if (!generateETag && chunk.length < 1000) {
-//       // just calculate length when no ETag + small chunk
-//       len = Buffer.byteLength(chunk, encoding)
-//     } else {
-//       // convert chunk to Buffer and calculate
-//       chunk = Buffer.from(chunk, encoding)
-//       encoding = undefined;
-//       len = chunk.length
-//     }
+    console.log('res.send 3');
 
-//     this.set('Content-Length', len);
-//   }
+    // write strings in utf-8
+    if (typeof chunk === 'string') {
+        encoding = 'utf8';
+        type = this.get('Content-Type');
 
-//   // populate ETag
-//   var etag;
-//   if (generateETag && len !== undefined) {
-//     if ((etag = etagFn(chunk, encoding))) {
-//       this.set('ETag', etag);
-//     }
-//   }
+        // reflect this in content-type
+        if (typeof type === 'string') {
+            this.set('Content-Type', setCharset(type, 'utf-8'));
+        }
+    }
 
-//   // freshness
-//   if (req.fresh) this.statusCode = 304;
+    console.log('res.send 4');
 
-//   // strip irrelevant headers
-//   if (204 === this.statusCode || 304 === this.statusCode) {
-//     this.removeHeader('Content-Type');
-//     this.removeHeader('Content-Length');
-//     this.removeHeader('Transfer-Encoding');
-//     chunk = '';
-//   }
+    // determine if ETag should be generated
+    var etagFn = app.get('etag fn');
+    var generateETag = !this.get('ETag') && typeof etagFn === 'function';
 
-//   // alter headers for 205
-//   if (this.statusCode === 205) {
-//     this.set('Content-Length', '0')
-//     this.removeHeader('Transfer-Encoding')
-//     chunk = ''
-//   }
+    console.log('res.send 5');
 
-//   if (req.method === 'HEAD') {
-//     // skip body for HEAD
-//     this.end();
-//   } else {
-//     // respond
-//     this.end(chunk, encoding);
-//   }
+    // populate Content-Length
+    var len;
+    if (chunk !== undefined) {
+        if (Buffer.isBuffer(chunk)) {
+            // get length of Buffer
+            len = chunk.length;
+        } else if (!generateETag && chunk.length < 1000) {
+            // just calculate length when no ETag + small chunk
+            len = Buffer.byteLength(chunk, encoding);
+        } else {
+            // convert chunk to Buffer and calculate
+            chunk = Buffer.from(chunk, encoding);
+            encoding = undefined;
+            len = chunk.length;
+        }
 
-//   return this;
-// };
+        this.set('Content-Length', len);
+    }
+
+    console.log('res.send 6');
+
+    // populate ETag
+    var etag;
+    if (generateETag && len !== undefined) {
+        if ((etag = etagFn(chunk, encoding))) {
+            this.set('ETag', etag);
+        }
+    }
+
+    console.log('res.send 7');
+
+    //   console.log('req.fresh', req.fresh);
+    //   console.log('this.statusCode', this.statusCode);
+
+    // freshness
+    //   if (req.fresh) this.statusCode = 304; // TODO fresh is broken for some reason
+
+    console.log('res.send 8');
+
+    // strip irrelevant headers
+    if (204 === this.statusCode || 304 === this.statusCode) {
+        this.removeHeader('Content-Type');
+        this.removeHeader('Content-Length');
+        this.removeHeader('Transfer-Encoding');
+        chunk = '';
+    }
+
+    console.log('res.send 9');
+
+    // alter headers for 205
+    if (this.statusCode === 205) {
+        this.set('Content-Length', '0');
+        this.removeHeader('Transfer-Encoding');
+        chunk = '';
+    }
+
+    console.log('res.send 10');
+
+    if (req.method === 'HEAD') {
+        console.log('res.send 11 head');
+        // skip body for HEAD
+        this.end();
+    } else {
+        // respond
+        console.log('res.send 12');
+        // this.end(chunk, encoding);
+
+        const finalResObject = {
+            status_code: 200, // TODO statusCode broken
+            headers: [],
+            body: Buffer.from(chunk), // TODO not done
+            streaming_strategy: globalThis.None,
+            upgrade: globalThis.None
+        };
+
+        // console.log(finalResObject);
+        // console.log(typeof globalThis._azleIc.reply);
+        // console.log(globalThis.HttpResponse);
+
+        console.log('typeof globalThis.ic', typeof globalThis.ic);
+
+        // TODO custom code
+        globalThis.ic.reply(finalResObject, globalThis.HttpResponse);
+    }
+
+    console.log('res.send 11');
+
+    return this;
+};
 
 // /**
 //  * Send JSON response.
@@ -598,31 +658,31 @@
 //   return this.sendFile(fullPath, opts, done)
 // };
 
-// /**
-//  * Set _Content-Type_ response header with `type` through `mime.lookup()`
-//  * when it does not contain "/", or set the Content-Type to `type` otherwise.
-//  *
-//  * Examples:
-//  *
-//  *     res.type('.html');
-//  *     res.type('html');
-//  *     res.type('json');
-//  *     res.type('application/json');
-//  *     res.type('png');
-//  *
-//  * @param {String} type
-//  * @return {ServerResponse} for chaining
-//  * @public
-//  */
+/**
+ * Set _Content-Type_ response header with `type` through `mime.lookup()`
+ * when it does not contain "/", or set the Content-Type to `type` otherwise.
+ *
+ * Examples:
+ *
+ *     res.type('.html');
+ *     res.type('html');
+ *     res.type('json');
+ *     res.type('application/json');
+ *     res.type('png');
+ *
+ * @param {String} type
+ * @return {ServerResponse} for chaining
+ * @public
+ */
 
-// res.contentType =
-// res.type = function contentType(type) {
-//   var ct = type.indexOf('/') === -1
-//     ? mime.lookup(type)
-//     : type;
+res.contentType = res.type = function contentType(type) {
+    console.log('res.type 0');
+    var ct = type.indexOf('/') === -1 ? mime.lookup(type) : type;
 
-//   return this.set('Content-Type', ct);
-// };
+    console.log('res.type 1');
+
+    return this.set('Content-Type', ct);
+};
 
 // /**
 //  * Respond to the Acceptable formats using an `obj`
@@ -755,62 +815,73 @@
 //   return this.set(field, value);
 // };
 
-// /**
-//  * Set header `field` to `val`, or pass
-//  * an object of header fields.
-//  *
-//  * Examples:
-//  *
-//  *    res.set('Foo', ['bar', 'baz']);
-//  *    res.set('Accept', 'application/json');
-//  *    res.set({ Accept: 'text/plain', 'X-API-Key': 'tobi' });
-//  *
-//  * Aliased as `res.header()`.
-//  *
-//  * @param {String|Object} field
-//  * @param {String|Array} val
-//  * @return {ServerResponse} for chaining
-//  * @public
-//  */
+/**
+ * Set header `field` to `val`, or pass
+ * an object of header fields.
+ *
+ * Examples:
+ *
+ *    res.set('Foo', ['bar', 'baz']);
+ *    res.set('Accept', 'application/json');
+ *    res.set({ Accept: 'text/plain', 'X-API-Key': 'tobi' });
+ *
+ * Aliased as `res.header()`.
+ *
+ * @param {String|Object} field
+ * @param {String|Array} val
+ * @return {ServerResponse} for chaining
+ * @public
+ */
 
-// res.set =
-// res.header = function header(field, val) {
-//   if (arguments.length === 2) {
-//     var value = Array.isArray(val)
-//       ? val.map(String)
-//       : String(val);
+res.set = res.header = function header(field, val) {
+    console.log('res.set -0');
 
-//     // add charset to content-type
-//     if (field.toLowerCase() === 'content-type') {
-//       if (Array.isArray(value)) {
-//         throw new TypeError('Content-Type cannot be set to an Array');
-//       }
-//       if (!charsetRegExp.test(value)) {
-//         var charset = mime.charsets.lookup(value.split(';')[0]);
-//         if (charset) value += '; charset=' + charset.toLowerCase();
-//       }
-//     }
+    if (arguments.length === 2) {
+        console.log('res.set -0.0');
 
-//     this.setHeader(field, value);
-//   } else {
-//     for (var key in field) {
-//       this.set(key, field[key]);
-//     }
-//   }
-//   return this;
-// };
+        var value = Array.isArray(val) ? val.map(String) : String(val);
 
-// /**
-//  * Get value for header `field`.
-//  *
-//  * @param {String} field
-//  * @return {String}
-//  * @public
-//  */
+        console.log('res.set -0.1');
 
-// res.get = function(field){
-//   return this.getHeader(field);
-// };
+        // add charset to content-type
+        if (field.toLowerCase() === 'content-type') {
+            console.log('res.set -0.2');
+            if (Array.isArray(value)) {
+                throw new TypeError('Content-Type cannot be set to an Array');
+            }
+            console.log('res.set -0.3');
+            if (!charsetRegExp.test(value)) {
+                console.log('res.set -0.4');
+                var charset = mime.charsets.lookup(value.split(';')[0]);
+                if (charset) value += '; charset=' + charset.toLowerCase();
+            }
+        }
+
+        console.log('res.set 0');
+
+        // this.setHeader(field, value); // TODO this comes from node http.OutgoingMessage
+    } else {
+        for (var key in field) {
+            console.log('res.set 1');
+            this.set(key, field[key]);
+        }
+    }
+    return this;
+};
+
+/**
+ * Get value for header `field`.
+ *
+ * @param {String} field
+ * @return {String}
+ * @public
+ */
+
+res.get = function (field) {
+    //   return this.getHeader(field);
+    return undefined; // TODO this comes from Node.js http.OutgoingMessage
+    // TODO seems we should really get the http module working
+};
 
 // /**
 //  * Clear cookie `name`.

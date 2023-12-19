@@ -24,14 +24,15 @@ var deprecate = require('depd')('express');
 // var proxyaddr = require('proxy-addr');
 
 // TODO custom code here
-class IncomingMessage {}
+class HttpIncomingMessage {}
 
 /**
  * Request prototype.
  * @public
  */
 
-var req = Object.create(IncomingMessage.prototype); // TODO custom code
+// TODO this is what came from Node.js, http.IncomingMessage I believe
+var req = Object.create(HttpIncomingMessage.prototype); // TODO custom code
 
 /**
  * Module exports.
@@ -471,12 +472,20 @@ defineGetter(
  */
 
 defineGetter(req, 'fresh', function () {
+    console.log('fresh getter 0');
+
     var method = this.method;
+    console.log('fresh getter 0.0');
     var res = this.res;
+    console.log('fresh getter 0.1');
     var status = res.statusCode;
+
+    console.log('fresh getter 1');
 
     // GET or HEAD for weak freshness validation only
     if ('GET' !== method && 'HEAD' !== method) return false;
+
+    console.log('fresh getter 2');
 
     // 2xx or 304 as per rfc2616 14.26
     if ((status >= 200 && status < 300) || 304 === status) {
@@ -485,6 +494,8 @@ defineGetter(req, 'fresh', function () {
             'last-modified': res.get('Last-Modified')
         });
     }
+
+    console.log('fresh getter 3');
 
     return false;
 });

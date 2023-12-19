@@ -51,10 +51,13 @@ globalThis.crypto = {
 globalThis.Buffer = Buffer;
 
 globalThis.setTimeout = (handler: any, timeout?: any) => {
-    return ic.setTimer(timeout, handler);
+    console.log('someone is trying to call setTimeout');
+    // return ic.setTimer(timeout, handler);
+    handler();
 };
 
 globalThis.setImmediate = (handler: any) => {
+    console.log('someone is trying to call setImmediate');
     return globalThis.setTimeout(handler, 0);
 };
 
