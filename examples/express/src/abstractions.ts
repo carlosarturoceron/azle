@@ -102,7 +102,20 @@ export function Server(callback: (app: Express) => any) {
 
                 res.req = req;
 
-                app.handle(req, res, () => {});
+                app.handle(req, res, (err) => {
+                    if (err !== undefined) {
+                        ic.reply(
+                            {
+                                status_code: 500,
+                                headers: [],
+                                body: Buffer.from(err.toString()),
+                                streaming_strategy: None,
+                                upgrade: None
+                            },
+                            HttpResponse
+                        );
+                    }
+                });
             },
             {
                 manual: true
@@ -123,7 +136,20 @@ export function Server(callback: (app: Express) => any) {
 
                 res.req = req;
 
-                app.handle(req, res, () => {});
+                app.handle(req, res, (err) => {
+                    if (err !== undefined) {
+                        ic.reply(
+                            {
+                                status_code: 500,
+                                headers: [],
+                                body: Buffer.from(err.toString()),
+                                streaming_strategy: None,
+                                upgrade: None
+                            },
+                            HttpResponse
+                        );
+                    }
+                });
             },
             {
                 manual: true

@@ -56,9 +56,10 @@ globalThis.setTimeout = (handler: any, timeout?: any) => {
     handler();
 };
 
-globalThis.setImmediate = (handler: any) => {
+globalThis.setImmediate = (handler: any, ...args: any[]) => {
     console.log('someone is trying to call setImmediate');
-    return globalThis.setTimeout(handler, 0);
+    // return globalThis.setTimeout(handler, 0);
+    handler(...args);
 };
 
 globalThis.window = globalThis;
