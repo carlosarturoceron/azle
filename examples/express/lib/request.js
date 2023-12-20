@@ -13,15 +13,15 @@
  * @private
  */
 
-// var accepts = require('accepts');
+var accepts = require('accepts');
 var deprecate = require('depd')('express');
-// var isIP = require('net').isIP;
-// var typeis = require('type-is');
-// var http = require('http');
-// var fresh = require('fresh');
-// var parseRange = require('range-parser');
-// var parse = require('parseurl');
-// var proxyaddr = require('proxy-addr');
+var isIP = require('net').isIP;
+var typeis = require('type-is');
+// var http = require('http'); // TODO custom code
+var fresh = require('fresh');
+var parseRange = require('range-parser');
+var parse = require('parseurl');
+var proxyaddr = require('proxy-addr');
 
 // TODO custom code here
 class HttpIncomingMessage {}

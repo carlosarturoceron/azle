@@ -12,7 +12,11 @@ export function generateCandidAndCanisterMethods(mainJs: string): {
     const vm = require('vm');
 
     const sandbox = {
-        globalThis: {},
+        globalThis: {
+            Error,
+            TypeError,
+            RangeError
+        },
         window: {},
         self: {},
         global: {},

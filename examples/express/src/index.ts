@@ -1,4 +1,5 @@
 import { StableBTreeMap } from 'azle';
+import { writeFileSync, readFileSync } from 'fs';
 
 import { Server } from './abstractions';
 
@@ -36,5 +37,17 @@ export default Server((app) => {
         db.insert(id, user);
 
         res.send('Saved\n');
+    });
+
+    app.get('/read', (req, res) => {
+        const contents = readFileSync('test.txt');
+
+        res.send(contents.toString());
+    });
+
+    app.post('/write/:contents', (req, res) => {
+        writeFileSync('test.txt', req.params.contents);
+
+        res.send('Written');
     });
 });

@@ -104,6 +104,7 @@ export function Server(callback: (app: Express) => any) {
 
                 app.handle(req, res, (err) => {
                     if (err !== undefined) {
+                        throw err;
                         ic.reply(
                             {
                                 status_code: 500,
@@ -138,6 +139,7 @@ export function Server(callback: (app: Express) => any) {
 
                 app.handle(req, res, (err) => {
                     if (err !== undefined) {
+                        throw err;
                         ic.reply(
                             {
                                 status_code: 500,

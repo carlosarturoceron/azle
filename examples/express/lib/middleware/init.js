@@ -28,7 +28,7 @@ var setPrototypeOf = require('setprototypeof');
 exports.init = function (app) {
     return function expressInit(req, res, next) {
         if (app.enabled('x-powered-by'))
-            res.setHeader('X-Powered-By', 'Express');
+            res.setHeader('X-Powered-By', 'Express'); // TODO setHeader comes from Node http so we'll need that
         req.res = res;
         res.req = req;
         req.next = next;

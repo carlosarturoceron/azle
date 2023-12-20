@@ -1,26 +1,26 @@
-// /*!
-//  * express
-//  * Copyright(c) 2009-2013 TJ Holowaychuk
-//  * Copyright(c) 2013 Roman Shtylman
-//  * Copyright(c) 2014-2015 Douglas Christopher Wilson
-//  * MIT Licensed
-//  */
+/*!
+ * express
+ * Copyright(c) 2009-2013 TJ Holowaychuk
+ * Copyright(c) 2013 Roman Shtylman
+ * Copyright(c) 2014-2015 Douglas Christopher Wilson
+ * MIT Licensed
+ */
 
-// 'use strict';
+'use strict';
 
-// /**
-//  * Module dependencies.
-//  * @private
-//  */
+/**
+ * Module dependencies.
+ * @private
+ */
 
-// var debug = require('debug')('express:view');
-// var path = require('path');
-// var fs = require('fs');
+var debug = require('debug')('express:view');
+var path = require('path');
+var fs = require('fs');
 
-// /**
-//  * Module variables.
-//  * @private
-//  */
+/**
+ * Module variables.
+ * @private
+ */
 
 // var dirname = path.dirname;
 // var basename = path.basename;

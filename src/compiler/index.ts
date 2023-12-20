@@ -77,6 +77,11 @@ async function azle() {
 
             const canisterJavaScript = compilationResult.ok as string;
 
+            writeFileSync(
+                `${canisterPath}/canister/src/main.js`,
+                canisterJavaScript
+            );
+
             const workspaceCargoToml: Toml = generateWorkspaceCargoToml(
                 canisterConfig.opt_level ?? '0'
             );

@@ -84,7 +84,7 @@ export function bundleFromString(ts: TypeScript): JavaScript {
         alias: {
             // TODO this is how you overwrite libraries
             crypto: 'crypto-browserify',
-            fs: 'memory-fs',
+            fs: 'memfs',
             zlib: 'pako'
             // fs: 'memory-fs',
             // fs: join(__dirname, '../polyfills/fs'),
