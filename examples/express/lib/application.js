@@ -25,10 +25,10 @@ var compileETag = require('./utils').compileETag;
 var compileQueryParser = require('./utils').compileQueryParser;
 var compileTrust = require('./utils').compileTrust;
 var deprecate = require('depd')('express');
-// var flatten = require('array-flatten');
-// var merge = require('utils-merge');
+var { flatten } = require('array-flatten');
+var merge = require('utils-merge');
 var resolve = require('path').resolve;
-// var setPrototypeOf = require('setprototypeof')
+var setPrototypeOf = require('setprototypeof');
 
 /**
  * Module variables.

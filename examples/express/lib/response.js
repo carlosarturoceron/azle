@@ -143,8 +143,6 @@ res.send = function send(body) {
         }
     }
 
-    console.log('res.send 1');
-
     // disambiguate res.send(status) and res.send(status, num)
     if (typeof chunk === 'number' && arguments.length === 1) {
         // res.send(status) will set status message as text string
@@ -157,17 +155,12 @@ res.send = function send(body) {
         chunk = statuses.message[chunk];
     }
 
-    console.log('res.send 2');
-
     switch (typeof chunk) {
         // string defaulting to html
         case 'string':
-            console.log('before switch');
             if (!this.get('Content-Type')) {
-                console.log('in switch');
                 this.type('html');
             }
-            console.log('out of switch');
             break;
         case 'boolean':
         case 'number':
@@ -184,8 +177,6 @@ res.send = function send(body) {
             break;
     }
 
-    console.log('res.send 3');
-
     // write strings in utf-8
     if (typeof chunk === 'string') {
         encoding = 'utf8';
@@ -197,13 +188,9 @@ res.send = function send(body) {
         }
     }
 
-    console.log('res.send 4');
-
     // determine if ETag should be generated
     var etagFn = app.get('etag fn');
     var generateETag = !this.get('ETag') && typeof etagFn === 'function';
-
-    console.log('res.send 5');
 
     // populate Content-Length
     var len;
@@ -224,25 +211,23 @@ res.send = function send(body) {
         this.set('Content-Length', len);
     }
 
-    console.log('res.send 6');
-
-    // populate ETag
-    var etag;
-    if (generateETag && len !== undefined) {
-        if ((etag = etagFn(chunk, encoding))) {
-            this.set('ETag', etag);
-        }
-    }
-
     console.log('res.send 7');
 
-    //   console.log('req.fresh', req.fresh);
-    //   console.log('this.statusCode', this.statusCode);
+    // populate ETag
+    // TODO skipping this for now
+    // var etag;
+    // if (generateETag && len !== undefined) {
+    //     console.log('res.send 7.0');
+    //     if ((etag = etagFn(chunk, encoding))) {
+    //         console.log('res.send 7.1');
+    //         this.set('ETag', etag);
+    //     }
+    // }
+
+    console.log('res.send 8');
 
     // freshness
     //   if (req.fresh) this.statusCode = 304; // TODO fresh is broken for some reason
-
-    console.log('res.send 8');
 
     // strip irrelevant headers
     if (204 === this.statusCode || 304 === this.statusCode) {
@@ -264,79 +249,89 @@ res.send = function send(body) {
     console.log('res.send 10');
 
     if (req.method === 'HEAD') {
-        console.log('res.send 11 head');
         // skip body for HEAD
         this.end();
     } else {
         // respond
-        console.log('res.send 12');
         // this.end(chunk, encoding);
 
-        const finalResObject = {
-            status_code: 200, // TODO statusCode broken
-            headers: [],
-            body: Buffer.from(chunk), // TODO not done
-            streaming_strategy: globalThis.None,
-            upgrade: globalThis.None
-        };
+        if (
+            req.method === 'POST' &&
+            globalThis._azleWithinHttpRequestUpdate !== true
+        ) {
+            globalThis.ic.reply(
+                {
+                    status_code: 204,
+                    headers: [],
+                    body: Buffer.from(''),
+                    streaming_strategy: globalThis.None,
+                    upgrade: globalThis.Some(true)
+                },
+                globalThis.HttpResponse
+            );
+        } else {
+            const finalResObject = {
+                status_code: 200, // TODO statusCode broken
+                headers: [],
+                body: Buffer.from(chunk), // TODO not done
+                streaming_strategy: globalThis.None,
+                upgrade: globalThis.None
+            };
 
-        // console.log(finalResObject);
-        // console.log(typeof globalThis._azleIc.reply);
-        // console.log(globalThis.HttpResponse);
-
-        console.log('typeof globalThis.ic', typeof globalThis.ic);
-
-        // TODO custom code
-        globalThis.ic.reply(finalResObject, globalThis.HttpResponse);
+            // TODO custom code
+            globalThis.ic.reply(finalResObject, globalThis.HttpResponse);
+        }
     }
-
-    console.log('res.send 11');
 
     return this;
 };
 
-// /**
-//  * Send JSON response.
-//  *
-//  * Examples:
-//  *
-//  *     res.json(null);
-//  *     res.json({ user: 'tj' });
-//  *
-//  * @param {string|number|boolean|object} obj
-//  * @public
-//  */
+/**
+ * Send JSON response.
+ *
+ * Examples:
+ *
+ *     res.json(null);
+ *     res.json({ user: 'tj' });
+ *
+ * @param {string|number|boolean|object} obj
+ * @public
+ */
 
-// res.json = function json(obj) {
-//   var val = obj;
+res.json = function json(obj) {
+    var val = obj;
 
-//   // allow status / body
-//   if (arguments.length === 2) {
-//     // res.json(body, status) backwards compat
-//     if (typeof arguments[1] === 'number') {
-//       deprecate('res.json(obj, status): Use res.status(status).json(obj) instead');
-//       this.statusCode = arguments[1];
-//     } else {
-//       deprecate('res.json(status, obj): Use res.status(status).json(obj) instead');
-//       this.statusCode = arguments[0];
-//       val = arguments[1];
-//     }
-//   }
+    // allow status / body
+    if (arguments.length === 2) {
+        // res.json(body, status) backwards compat
+        if (typeof arguments[1] === 'number') {
+            deprecate(
+                'res.json(obj, status): Use res.status(status).json(obj) instead'
+            );
+            this.statusCode = arguments[1];
+        } else {
+            deprecate(
+                'res.json(status, obj): Use res.status(status).json(obj) instead'
+            );
+            this.statusCode = arguments[0];
+            val = arguments[1];
+        }
+    }
 
-//   // settings
-//   var app = this.app;
-//   var escape = app.get('json escape')
-//   var replacer = app.get('json replacer');
-//   var spaces = app.get('json spaces');
-//   var body = stringify(val, replacer, spaces, escape)
+    // settings
+    var app = this.app;
+    var escape = app.get('json escape');
+    var replacer = app.get('json replacer');
+    var spaces = app.get('json spaces');
+    var body = stringify(val, replacer, spaces, escape);
 
-//   // content-type
-//   if (!this.get('Content-Type')) {
-//     this.set('Content-Type', 'application/json');
-//   }
+    // content-type
+    if (!this.get('Content-Type')) {
+        this.set('Content-Type', 'application/json');
+    }
 
-//   return this.send(body);
-// };
+    return this.send(body);
+};
 
 // /**
 //  * Send JSON response with JSONP callback support.
@@ -676,10 +671,7 @@ res.send = function send(body) {
  */
 
 res.contentType = res.type = function contentType(type) {
-    console.log('res.type 0');
     var ct = type.indexOf('/') === -1 ? mime.lookup(type) : type;
-
-    console.log('res.type 1');
 
     return this.set('Content-Type', ct);
 };
@@ -834,35 +826,23 @@ res.contentType = res.type = function contentType(type) {
  */
 
 res.set = res.header = function header(field, val) {
-    console.log('res.set -0');
-
     if (arguments.length === 2) {
-        console.log('res.set -0.0');
-
         var value = Array.isArray(val) ? val.map(String) : String(val);
-
-        console.log('res.set -0.1');
 
         // add charset to content-type
         if (field.toLowerCase() === 'content-type') {
-            console.log('res.set -0.2');
             if (Array.isArray(value)) {
                 throw new TypeError('Content-Type cannot be set to an Array');
             }
-            console.log('res.set -0.3');
             if (!charsetRegExp.test(value)) {
-                console.log('res.set -0.4');
                 var charset = mime.charsets.lookup(value.split(';')[0]);
                 if (charset) value += '; charset=' + charset.toLowerCase();
             }
         }
 
-        console.log('res.set 0');
-
         // this.setHeader(field, value); // TODO this comes from node http.OutgoingMessage
     } else {
         for (var key in field) {
-            console.log('res.set 1');
             this.set(key, field[key]);
         }
     }
@@ -1201,40 +1181,41 @@ res.get = function (field) {
 //   file.pipe(res);
 // }
 
-// /**
-//  * Stringify JSON, like JSON.stringify, but v8 optimized, with the
-//  * ability to escape characters that can trigger HTML sniffing.
-//  *
-//  * @param {*} value
-//  * @param {function} replacer
-//  * @param {number} spaces
-//  * @param {boolean} escape
-//  * @returns {string}
-//  * @private
-//  */
+/**
+ * Stringify JSON, like JSON.stringify, but v8 optimized, with the
+ * ability to escape characters that can trigger HTML sniffing.
+ *
+ * @param {*} value
+ * @param {function} replacer
+ * @param {number} spaces
+ * @param {boolean} escape
+ * @returns {string}
+ * @private
+ */
 
-// function stringify (value, replacer, spaces, escape) {
-//   // v8 checks arguments.length for optimizing simple call
-//   // https://bugs.chromium.org/p/v8/issues/detail?id=4730
-//   var json = replacer || spaces
-//     ? JSON.stringify(value, replacer, spaces)
-//     : JSON.stringify(value);
+function stringify(value, replacer, spaces, escape) {
+    // v8 checks arguments.length for optimizing simple call
+    // https://bugs.chromium.org/p/v8/issues/detail?id=4730
+    var json =
+        replacer || spaces
+            ? JSON.stringify(value, replacer, spaces)
+            : JSON.stringify(value);
 
-//   if (escape && typeof json === 'string') {
-//     json = json.replace(/[<>&]/g, function (c) {
-//       switch (c.charCodeAt(0)) {
-//         case 0x3c:
-//           return '\\u003c'
-//         case 0x3e:
-//           return '\\u003e'
-//         case 0x26:
-//           return '\\u0026'
-//         /* istanbul ignore next: unreachable default */
-//         default:
-//           return c
-//       }
-//     })
-//   }
+    if (escape && typeof json === 'string') {
+        json = json.replace(/[<>&]/g, function (c) {
+            switch (c.charCodeAt(0)) {
+                case 0x3c:
+                    return '\\u003c';
+                case 0x3e:
+                    return '\\u003e';
+                case 0x26:
+                    return '\\u0026';
+                /* istanbul ignore next: unreachable default */
+                default:
+                    return c;
+            }
+        });
+    }
 
-//   return json
-// }
+    return json;
+}

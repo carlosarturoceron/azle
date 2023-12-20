@@ -17,7 +17,9 @@ import {
     None,
     Manual,
     ic,
-    init
+    init,
+    Some,
+    update
 } from 'azle';
 import express from '../lib/express';
 
@@ -62,6 +64,7 @@ export const HttpResponse = Record({
 
 globalThis.HttpResponse = HttpResponse;
 globalThis.None = None;
+globalThis.Some = Some;
 globalThis.ic = ic;
 
 export const HttpRequest = Record({
@@ -88,6 +91,29 @@ export function Server(callback: (app: Express) => any) {
             [HttpRequest],
             Manual(HttpResponse),
             (httpRequest) => {
+                globalThis._azleWithinHttpRequestUpdate = false;
+
+                let req = Object.create(app.request);
+
+                req.url = httpRequest.url;
+                req.method = httpRequest.method;
+
+                let res = Object.create(app.response);
+
+                res.req = req;
+
+                app.handle(req, res, () => {});
+            },
+            {
+                manual: true
+            }
+        ),
+        http_request_update: update(
+            [HttpRequest],
+            Manual(HttpResponse),
+            (httpRequest) => {
+                globalThis._azleWithinHttpRequestUpdate = true;
+
                 let req = Object.create(app.request);
 
                 req.url = httpRequest.url;

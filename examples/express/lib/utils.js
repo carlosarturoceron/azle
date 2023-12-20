@@ -1,143 +1,147 @@
-// /*!
-//  * express
-//  * Copyright(c) 2009-2013 TJ Holowaychuk
-//  * Copyright(c) 2014-2015 Douglas Christopher Wilson
-//  * MIT Licensed
-//  */
+/*!
+ * express
+ * Copyright(c) 2009-2013 TJ Holowaychuk
+ * Copyright(c) 2014-2015 Douglas Christopher Wilson
+ * MIT Licensed
+ */
 
-// 'use strict';
+'use strict';
 
-// /**
-//  * Module dependencies.
-//  * @api private
-//  */
+/**
+ * Module dependencies.
+ * @api private
+ */
 
-// var Buffer = require('safe-buffer').Buffer
-// var contentDisposition = require('content-disposition');
-// var contentType = require('content-type');
-// var deprecate = require('depd')('express');
-// var flatten = require('array-flatten');
-// var mime = require('send').mime;
-// var etag = require('etag');
+var Buffer = require('safe-buffer').Buffer;
+var contentDisposition = require('content-disposition');
+var contentType = require('content-type');
+var deprecate = require('depd')('express');
+var { flatten } = require('array-flatten');
+var mime = require('send').mime;
+var etag = require('etag');
 var proxyaddr = require('proxy-addr');
-// var qs = require('qs');
-// var querystring = require('querystring');
+var qs = require('qs');
+var querystring = require('querystring');
 
-// /**
-//  * Return strong ETag for `body`.
-//  *
-//  * @param {String|Buffer} body
-//  * @param {String} [encoding]
-//  * @return {String}
-//  * @api private
-//  */
+/**
+ * Return strong ETag for `body`.
+ *
+ * @param {String|Buffer} body
+ * @param {String} [encoding]
+ * @return {String}
+ * @api private
+ */
 
-// exports.etag = createETagGenerator({ weak: false })
+exports.etag = createETagGenerator({ weak: false });
 
-// /**
-//  * Return weak ETag for `body`.
-//  *
-//  * @param {String|Buffer} body
-//  * @param {String} [encoding]
-//  * @return {String}
-//  * @api private
-//  */
+/**
+ * Return weak ETag for `body`.
+ *
+ * @param {String|Buffer} body
+ * @param {String} [encoding]
+ * @return {String}
+ * @api private
+ */
 
-// exports.wetag = createETagGenerator({ weak: true })
+exports.wetag = createETagGenerator({ weak: true });
 
-// /**
-//  * Check if `path` looks absolute.
-//  *
-//  * @param {String} path
-//  * @return {Boolean}
-//  * @api private
-//  */
+/**
+ * Check if `path` looks absolute.
+ *
+ * @param {String} path
+ * @return {Boolean}
+ * @api private
+ */
 
-// exports.isAbsolute = function(path){
-//   if ('/' === path[0]) return true;
-//   if (':' === path[1] && ('\\' === path[2] || '/' === path[2])) return true; // Windows device path
-//   if ('\\\\' === path.substring(0, 2)) return true; // Microsoft Azure absolute path
-// };
+exports.isAbsolute = function (path) {
+    if ('/' === path[0]) return true;
+    if (':' === path[1] && ('\\' === path[2] || '/' === path[2])) return true; // Windows device path
+    if ('\\\\' === path.substring(0, 2)) return true; // Microsoft Azure absolute path
+};
 
-// /**
-//  * Flatten the given `arr`.
-//  *
-//  * @param {Array} arr
-//  * @return {Array}
-//  * @api private
-//  */
+/**
+ * Flatten the given `arr`.
+ *
+ * @param {Array} arr
+ * @return {Array}
+ * @api private
+ */
 
-// exports.flatten = deprecate.function(flatten,
-//   'utils.flatten: use array-flatten npm module instead');
+exports.flatten = deprecate.function(
+    flatten,
+    'utils.flatten: use array-flatten npm module instead'
+);
 
-// /**
-//  * Normalize the given `type`, for example "html" becomes "text/html".
-//  *
-//  * @param {String} type
-//  * @return {Object}
-//  * @api private
-//  */
+/**
+ * Normalize the given `type`, for example "html" becomes "text/html".
+ *
+ * @param {String} type
+ * @return {Object}
+ * @api private
+ */
 
-// exports.normalizeType = function(type){
-//   return ~type.indexOf('/')
-//     ? acceptParams(type)
-//     : { value: mime.lookup(type), params: {} };
-// };
+exports.normalizeType = function (type) {
+    return ~type.indexOf('/')
+        ? acceptParams(type)
+        : { value: mime.lookup(type), params: {} };
+};
 
-// /**
-//  * Normalize `types`, for example "html" becomes "text/html".
-//  *
-//  * @param {Array} types
-//  * @return {Array}
-//  * @api private
-//  */
+/**
+ * Normalize `types`, for example "html" becomes "text/html".
+ *
+ * @param {Array} types
+ * @return {Array}
+ * @api private
+ */
 
-// exports.normalizeTypes = function(types){
-//   var ret = [];
+exports.normalizeTypes = function (types) {
+    var ret = [];
 
-//   for (var i = 0; i < types.length; ++i) {
-//     ret.push(exports.normalizeType(types[i]));
-//   }
+    for (var i = 0; i < types.length; ++i) {
+        ret.push(exports.normalizeType(types[i]));
+    }
 
-//   return ret;
-// };
+    return ret;
+};
 
-// /**
-//  * Generate Content-Disposition header appropriate for the filename.
-//  * non-ascii filenames are urlencoded and a filename* parameter is added
-//  *
-//  * @param {String} filename
-//  * @return {String}
-//  * @api private
-//  */
+/**
+ * Generate Content-Disposition header appropriate for the filename.
+ * non-ascii filenames are urlencoded and a filename* parameter is added
+ *
+ * @param {String} filename
+ * @return {String}
+ * @api private
+ */
 
-// exports.contentDisposition = deprecate.function(contentDisposition,
-//   'utils.contentDisposition: use content-disposition npm module instead');
+exports.contentDisposition = deprecate.function(
+    contentDisposition,
+    'utils.contentDisposition: use content-disposition npm module instead'
+);
 
-// /**
-//  * Parse accept params `str` returning an
-//  * object with `.value`, `.quality` and `.params`.
-//  *
-//  * @param {String} str
-//  * @return {Object}
-//  * @api private
-//  */
+/**
+ * Parse accept params `str` returning an
+ * object with `.value`, `.quality` and `.params`.
+ *
+ * @param {String} str
+ * @return {Object}
+ * @api private
+ */
 
-// function acceptParams (str) {
-//   var parts = str.split(/ *; */);
-//   var ret = { value: parts[0], quality: 1, params: {} }
+function acceptParams(str) {
+    var parts = str.split(/ *; */);
+    var ret = { value: parts[0], quality: 1, params: {} };
 
-//   for (var i = 1; i < parts.length; ++i) {
-//     var pms = parts[i].split(/ *= */);
-//     if ('q' === pms[0]) {
-//       ret.quality = parseFloat(pms[1]);
-//     } else {
-//       ret.params[pms[0]] = pms[1];
-//     }
-//   }
+    for (var i = 1; i < parts.length; ++i) {
+        var pms = parts[i].split(/ *= */);
+        if ('q' === pms[0]) {
+            ret.quality = parseFloat(pms[1]);
+        } else {
+            ret.params[pms[0]] = pms[1];
+        }
+    }
 
-//   return ret;
-// }
+    return ret;
+}
 
 /**
  * Compile "etag" value to function.
@@ -241,48 +245,46 @@ exports.compileTrust = function (val) {
     return proxyaddr.compile(val || []);
 };
 
-// /**
-//  * Set the charset in a given Content-Type string.
-//  *
-//  * @param {String} type
-//  * @param {String} charset
-//  * @return {String}
-//  * @api private
-//  */
+/**
+ * Set the charset in a given Content-Type string.
+ *
+ * @param {String} type
+ * @param {String} charset
+ * @return {String}
+ * @api private
+ */
 
-// exports.setCharset = function setCharset(type, charset) {
-//   if (!type || !charset) {
-//     return type;
-//   }
+exports.setCharset = function setCharset(type, charset) {
+    if (!type || !charset) {
+        return type;
+    }
 
-//   // parse type
-//   var parsed = contentType.parse(type);
+    // parse type
+    var parsed = contentType.parse(type);
 
-//   // set charset
-//   parsed.parameters.charset = charset;
+    // set charset
+    parsed.parameters.charset = charset;
 
-//   // format type
-//   return contentType.format(parsed);
-// };
+    // format type
+    return contentType.format(parsed);
+};
 
-// /**
-//  * Create an ETag generator function, generating ETags with
-//  * the given options.
-//  *
-//  * @param {object} options
-//  * @return {function}
-//  * @private
-//  */
+/**
+ * Create an ETag generator function, generating ETags with
+ * the given options.
+ *
+ * @param {object} options
+ * @return {function}
+ * @private
+ */
 
-// function createETagGenerator (options) {
-//   return function generateETag (body, encoding) {
-//     var buf = !Buffer.isBuffer(body)
-//       ? Buffer.from(body, encoding)
-//       : body
+function createETagGenerator(options) {
+    return function generateETag(body, encoding) {
+        var buf = !Buffer.isBuffer(body) ? Buffer.from(body, encoding) : body;
 
-//     return etag(buf, options)
-//   }
-// }
+        return etag(buf, options);
+    };
+}
 
 /**
  * Parse an extended query string with qs.
@@ -298,13 +300,13 @@ function parseExtendedQueryString(str) {
     });
 }
 
-// /**
-//  * Return new empty object.
-//  *
-//  * @return {Object}
-//  * @api private
-//  */
+/**
+ * Return new empty object.
+ *
+ * @return {Object}
+ * @api private
+ */
 
-// function newObject() {
-//   return {};
-// }
+function newObject() {
+    return {};
+}
