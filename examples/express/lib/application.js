@@ -20,7 +20,7 @@ var middleware = require('./middleware/init');
 var query = require('./middleware/query');
 var debug = require('debug')('express:application');
 var View = require('./view');
-// var http = require('http');
+// var http = require('http'); // TODO must implement
 var compileETag = require('./utils').compileETag;
 var compileQueryParser = require('./utils').compileQueryParser;
 var compileTrust = require('./utils').compileTrust;
@@ -121,7 +121,7 @@ app.defaultConfiguration = function defaultConfiguration() {
 
     // default configuration
     this.set('view', View);
-    // this.set('views', resolve('views')); // TODO Azle: broken
+    this.set('views', resolve('views'));
     this.set('jsonp callback name', 'callback');
 
     if (env === 'production') {

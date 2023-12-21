@@ -245,12 +245,11 @@ proto.handle = function handle(req, res, out) {
                 continue;
             }
 
-            // TODO is there a problem officer? It's an empty object
-            // if (layerError) {
-            //   // routes do not match with a pending error
-            //   match = false;
-            //   continue;
-            // }
+            if (layerError) {
+                // routes do not match with a pending error
+                match = false;
+                continue;
+            }
 
             var method = req.method;
             var has_method = route._handles_method(method);
