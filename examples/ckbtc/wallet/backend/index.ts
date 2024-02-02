@@ -36,7 +36,7 @@ export default Canister({
                 `icp://${ckBTC.principal.toText()}/icrc1_balance_of`,
                 {
                     body: serialize({
-                        candidPath: `/canisters/icrc.did`
+                        candidPath: `/candid/icrc.did`
                     })
                 }
             );
