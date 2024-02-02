@@ -40,11 +40,11 @@ export default Canister({
                         args: [
                             {
                                 owner: ic.id(),
-                                subaccount: Some(
+                                subaccount: [
                                     padPrincipalWithZeros(
                                         ic.caller().toUint8Array()
                                     )
-                                )
+                                ]
                             }
                         ]
                     })
