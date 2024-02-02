@@ -33,7 +33,7 @@ export default Canister({
         if (process.env.AZLE_TEST_FETCH === 'true' || true) {
             const response = await fetch(
                 // @ts-ignore
-                `icp://${ICRC.principal.toText()}/icrc1_balance_of`,
+                `icp://${ckBTC.principal.toText()}/icrc1_balance_of`,
                 {
                     body: serialize({
                         candidPath: `/canisters/icrc.did`
