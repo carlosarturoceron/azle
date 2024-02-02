@@ -13,6 +13,7 @@ import {
     nat,
     nat64,
     postUpgrade,
+    serialize,
     text,
     update
 } from 'azle';
@@ -29,16 +30,31 @@ export default Canister({
     init: init([], setupCanisters),
     postUpgrade: postUpgrade([], setupCanisters),
     getBalance: update([], nat64, async () => {
-        return await ic.call(ckBTC.icrc1_balance_of, {
-            args: [
+        if (process.env.AZLE_TEST_FETCH === 'true' || true) {
+            const response = await fetch(
+                // @ts-ignore
+                `icp://${ICRC.principal.toText()}/icrc1_balance_of`,
                 {
-                    owner: ic.id(),
-                    subaccount: Some(
-                        padPrincipalWithZeros(ic.caller().toUint8Array())
-                    )
+                    body: serialize({
+                        candidPath: `/canisters/icrc.did`
+                    })
                 }
-            ]
-        });
+            );
+            const responseJson = await response.json();
+
+            return responseJson;
+        } else {
+            return await ic.call(ckBTC.icrc1_balance_of, {
+                args: [
+                    {
+                        owner: ic.id(),
+                        subaccount: Some(
+                            padPrincipalWithZeros(ic.caller().toUint8Array())
+                        )
+                    }
+                ]
+            });
+        }
     }),
     updateBalance: update([], UpdateBalanceResult, async () => {
         return await ic.call(minter.update_balance, {
